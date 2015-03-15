@@ -20,13 +20,11 @@ class SocketProcessor implements Runnable {
     private Socket sock;
     private InputStream instream;
     private OutputStream outstream;
-    private String root;
     private static final MessageParser parser = new MessageParser();
     public static final int DEFAULT_STORAGE_SIZE = 2048;
     ByteBuffer storage = ByteBuffer.allocate(DEFAULT_STORAGE_SIZE);
 
-    SocketProcessor(Socket s, String root) throws Throwable {
-        this.root = root;
+    SocketProcessor(Socket s) throws Throwable {
         this.sock = s;
         this.instream = s.getInputStream();
         this.outstream = s.getOutputStream();
