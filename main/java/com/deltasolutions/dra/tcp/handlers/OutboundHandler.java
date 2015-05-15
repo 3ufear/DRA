@@ -1,4 +1,4 @@
-package com.deltasolutions.dra.tcp;
+package com.deltasolutions.dra.tcp.handlers;
 
 import com.deltasolutions.dra.base.Avp;
 import com.deltasolutions.dra.base.IMessage;
@@ -6,6 +6,9 @@ import com.deltasolutions.dra.base.Message;
 import com.deltasolutions.dra.base.ParseException;
 import com.deltasolutions.dra.parser.AvpSetImpl;
 import com.deltasolutions.dra.parser.MessageImpl;
+import com.deltasolutions.dra.tcp.ClientConnectionsPool;
+import com.deltasolutions.dra.tcp.Encoder.DiameterEncoder;
+import com.deltasolutions.dra.tcp.ServerConnectionsPool;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.*;
@@ -25,7 +28,7 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
     private ServerConnectionsPool ServerChannel = ServerConnectionsPool.getInstance();
     private ClientConnectionsPool ClientChannel = ClientConnectionsPool.getInstance();
 
-    OutboundHandler() {
+    public OutboundHandler() {
         System.out.println("OUTBOUNDHANDLER");
         this.resultCode = 2001;
         this.originHost = "192.168.0.149";

@@ -9,6 +9,7 @@ public class ProxyServer {
     public static String productName = "Proxy";
 
     public static void main(String[] args) throws Throwable {
+
         if (args.length < 1) {
             System.out.println("Usage: <port>");
         } else {

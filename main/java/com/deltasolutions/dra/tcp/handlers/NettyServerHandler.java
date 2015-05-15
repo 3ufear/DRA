@@ -1,6 +1,8 @@
-package com.deltasolutions.dra.tcp;
+package com.deltasolutions.dra.tcp.handlers;
 
 import com.deltasolutions.dra.base.IMessage;
+import com.deltasolutions.dra.tcp.CommandProcessorSmall;
+import com.deltasolutions.dra.tcp.NetContext;
 import org.jboss.netty.channel.*;
 import org.jboss.netty.channel.socket.ClientSocketChannelFactory;
 

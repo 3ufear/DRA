@@ -1,4 +1,4 @@
-package com.deltasolutions.dra.tcp;
+package com.deltasolutions.dra.tcp.Encoder;
 
 import com.deltasolutions.dra.parser.MessageParser;
 import org.jboss.netty.buffer.ChannelBuffer;

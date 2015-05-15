@@ -6,6 +6,7 @@ import com.deltasolutions.dra.base.Message;
 import com.deltasolutions.dra.base.ParseException;
 import com.deltasolutions.dra.parser.AvpSetImpl;
 import com.deltasolutions.dra.parser.MessageImpl;
+import com.deltasolutions.dra.tcp.Encoder.DiameterEncoder;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
@@ -93,6 +94,7 @@ public class CommandProcessorSmall extends Thread {
                     if (_debug) {
                         System.out.println(_nCtx.message.getSessionId() + "  CCAAnsewr");
                     }
+                   // _nCtx.message.getAvps().getAvp()
                     _nCtx.message.getAvps().addAvp(Avp.ROUTE_RECORD, 636);
                     ch.write(ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(_nCtx.message)));//ССR request;
                     break;
