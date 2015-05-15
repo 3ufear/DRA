@@ -28,7 +28,7 @@ public class CommandProcessorSmall extends Thread {
     String product_name = "DiamProxy";
     int appId = 123;
     int InbandSecurityId = 0;
-    ServerConnectionsPool Channels = ServerConnectionsPool.getInstance();
+    ServerConnectionsPool Channels = null;//ServerConnectionsPool.getInstance();
     ClientConnectionsPool ClientChannels = ClientConnectionsPool.getInstance();
 
 

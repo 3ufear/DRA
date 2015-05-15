@@ -19,20 +19,21 @@ public class ServerConnectionsFactory extends Thread {
     private String realm;
     private String productName;
     private ClientBootstrap cb;
+    private String name;
 
     public ServerConnectionsFactory() {
         remoteHost = "localhost";
         remotePort = 8080;
+
         realm = "DiamRealm";
         productName = "DiameterProxy";
     }
 
-    public ServerConnectionsFactory(String host, String realm, String productName) {
+    public ServerConnectionsFactory(String host, String name) {
         String[] str = host.split(":");
-        remoteHost = str[0];
-        remotePort = Integer.parseInt(str[1]);
-        this.realm = realm;
-        this.productName = productName;
+        this.remoteHost = str[0];
+        this.remotePort = Integer.parseInt(str[1]);
+        this.name = name;
     }
 
     @Override
@@ -41,7 +42,7 @@ public class ServerConnectionsFactory extends Thread {
         ClientSocketChannelFactory cf = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
         cb = new ClientBootstrap(cf);
         cb.getPipeline().addLast("framer", new DiameterEncoder());
-        cb.getPipeline().addLast("handler", new OutboundHandler());
+        cb.getPipeline().addLast("handler", new OutboundHandler(name));
         ChannelFuture f = cb.connect(new InetSocketAddress(remoteHost, remotePort));
         f.getChannel().getCloseFuture().awaitUninterruptibly();
         // Shut down thread pools to exit.

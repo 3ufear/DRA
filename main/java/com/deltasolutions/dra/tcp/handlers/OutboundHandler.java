@@ -4,11 +4,11 @@ import com.deltasolutions.dra.base.Avp;
 import com.deltasolutions.dra.base.IMessage;
 import com.deltasolutions.dra.base.Message;
 import com.deltasolutions.dra.base.ParseException;
+import com.deltasolutions.dra.chanelChooserHelper.ChanelChooser;
 import com.deltasolutions.dra.parser.AvpSetImpl;
 import com.deltasolutions.dra.parser.MessageImpl;
 import com.deltasolutions.dra.tcp.ClientConnectionsPool;
 import com.deltasolutions.dra.tcp.Encoder.DiameterEncoder;
-import com.deltasolutions.dra.tcp.ServerConnectionsPool;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.*;
@@ -24,8 +24,9 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
     private int appId;
     private int resultCode;
     private Channel ch = null;
+    private String name;
 
-    private ServerConnectionsPool ServerChannel = ServerConnectionsPool.getInstance();
+    private ChanelChooser channelChooser = ChanelChooser.getInstance();//ServerConnectionsPool.getInstance();
     private ClientConnectionsPool ClientChannel = ClientConnectionsPool.getInstance();
 
     public OutboundHandler() {
@@ -36,6 +37,17 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
         this.vendorId = 12414;
         this.productName = "DiamProxy";
         this.appId = 1414145;
+    }
+
+    public OutboundHandler(String name) {
+        System.out.println("OUTBOUNDHANDLER");
+        this.resultCode = 2001;
+        this.originHost = "192.168.0.149";
+        this.originRealm = "vimpelcom.com";
+        this.vendorId = 12414;
+        this.productName = "DiamProxy";
+        this.appId = 1414145;
+        this.name = name;
     }
 
     OutboundHandler(String originHost, String originRealm, int vendorId, String productName, int appId) {
@@ -80,7 +92,7 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws ParseException {
         System.out.println("Connected to server");
         this.ch = e.getChannel();
-        ServerChannel.setConnection(ch);
+        channelChooser.getPoolByName(name).setConnection(ch);
         ch.write(CER_msg());
     }
 

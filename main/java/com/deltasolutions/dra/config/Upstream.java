@@ -9,8 +9,9 @@ import java.util.List;
  * Created by phil on 15-May-15.
  */
 public class Upstream {
+    private boolean isDefault = false;
+    private boolean isActive = false;
     private String name;
-    private ProxyAgent proxyAgent;
     private List<String> hosts = new ArrayList<String>();
 
     Upstream() {
@@ -21,6 +22,9 @@ public class Upstream {
         this.name = name;
     }
 
+    public String getName() {
+        return this.name;
+    }
     public void setName(String name) {
         this.name = name;
     }
@@ -30,9 +34,25 @@ public class Upstream {
     }
 
     public String[] getHosts() {
-        return (String[]) hosts.toArray();
+        String[] hosts = new String[this.hosts.size()];
+        this.hosts.toArray(hosts);
+        return hosts;//.toArray();
     }
 
+    public void setActive() {
+        this.isActive = true;
+    }
+
+    public boolean isActive() {
+        return this.isActive;
+    }
+    public boolean isDefault() {
+        return this.isDefault;
+    }
+
+    public void setDefault() {
+        this.isDefault = true;
+    }
     @Override
     public String toString() {
         String str = new String();

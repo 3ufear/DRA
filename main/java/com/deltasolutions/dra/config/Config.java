@@ -26,7 +26,8 @@ public class Config {
 
 
 
-    Config(String Path) throws FileNotFoundException {
+
+    public Config(String Path) throws FileNotFoundException {
         this.filePath = Path;
         exists(filePath);
         in = new BufferedReader(new FileReader(filePath));
@@ -109,7 +110,7 @@ public class Config {
                                 agent.setAppId(Integer.parseInt(str[1]));
                             } else if (str[0].toLowerCase().equals("default:")) {
                                 if (str.length >= 2) {
-
+                                    this.setDefaultUpstream(str[1]);
                                 }
                             }
                         }
@@ -152,6 +153,29 @@ public class Config {
             throw new Exception(e);
         }
         return null;
+    }
+    public void setActiveUpstream(String upstream) {
+        setActiveUpstream(upstream, false);
+    }
+    public void setActiveUpstream(String upstream, boolean isDefault) {
+        Iterator it = upstreamList.iterator();
+        while (it.hasNext()) {
+            Upstream up = (Upstream) it.next();
+            if (up.getName().equals(upstream)) {
+                up.setActive();
+                if (isDefault) {
+                    up.setDefault();
+                }
+            }
+        }
+    }
+
+    public void setDefaultUpstream(String upstream) {
+        setActiveUpstream(upstream, true);
+    }
+
+    public List<Upstream> getUpstreamList() {
+        return  this.upstreamList;
     }
 
     @Override

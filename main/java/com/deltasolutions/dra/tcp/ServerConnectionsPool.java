@@ -3,18 +3,16 @@ package com.deltasolutions.dra.tcp;
 import org.jboss.netty.channel.Channel;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by phil on 13-May-15.
  */
 public class ServerConnectionsPool {
-    private static ServerConnectionsPool instance = null;
     private int i = 1;
     private List<Channel> ServerConnections = new ArrayList<Channel>();
 
-    private ServerConnectionsPool() {
+    public ServerConnectionsPool() {
 
     }
 
@@ -35,16 +33,9 @@ public class ServerConnectionsPool {
         for (int k = 0;k < num; k++) {
             ServerConnections.add(ch);
         }
-        Collections.shuffle(this.ServerConnections);
+      //  Collections.shuffle(this.ServerConnections);
     }
 
-    public static ServerConnectionsPool getInstance() {
-        if (instance == null) {
-            instance = new ServerConnectionsPool();
-        }
-        return instance;
-
-    }
 
 
 }
