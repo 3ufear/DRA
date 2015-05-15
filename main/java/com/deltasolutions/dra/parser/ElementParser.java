@@ -255,8 +255,8 @@ public class ElementParser implements IElementParser {
       AvpSetImpl avps = new AvpSetImpl();
       int tmp, counter = shift;
       DataInputStream in = new DataInputStream(new ByteArrayInputStream(buffer, shift, buffer.length /* - shift ? */));
-
       while (counter < buffer.length) {
+
         int code = in.readInt();
         tmp = in.readInt();
         int flags = (tmp >> 24) & 0xFF;

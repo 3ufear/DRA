@@ -131,7 +131,6 @@ public interface IPeer extends Peer {
    *
    * @return peer statistic
    */
-  IStatistic getStatistic();
 
   /**
    * Return if peer is connected

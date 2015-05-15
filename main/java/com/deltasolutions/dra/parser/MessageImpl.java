@@ -60,8 +60,6 @@ public class MessageImpl implements IMessage {
   boolean isNetworkRequest = false;
 
   transient IPeer peer;
-  transient TimerTask timerTask;
-  transient IEventListener listener;
 
   // Cached result for getApplicationIdAvps() method. It is called extensively and takes some time.
   // Potential place for dirt, but Application IDs don't change during message life time.
@@ -93,7 +91,7 @@ public class MessageImpl implements IMessage {
    * @param endToEndId
    * @param avpSet
    */
-  MessageImpl(int commandCode, long applicationId, short flags, long hopByHopId, long endToEndId, AvpSetImpl avpSet) {
+  public MessageImpl(int commandCode, long applicationId, short flags, long hopByHopId, long endToEndId, AvpSetImpl avpSet) {
     this(commandCode, applicationId);
     this.flags = flags;
     this.hopByHopId = hopByHopId;
@@ -421,34 +419,7 @@ public class MessageImpl implements IMessage {
     state = newState;
   }
 
-  public void createTimer(ScheduledExecutorService scheduledFacility, long timeOut, TimeUnit timeUnit) {
-    timerTask = new TimerTask(this);
-    timerTask.setTimerHandler(scheduledFacility, scheduledFacility.schedule(timerTask, timeOut, timeUnit));
-  }
 
-  public void runTimer() {
-    if (timerTask != null && !timerTask.isDone() && !timerTask.isCancelled()) {
-      timerTask.run();
-    }
-  }
-
-  public boolean isTimeOut() {
-    return timerTask != null && timerTask.isDone() && !timerTask.isCancelled();
-  }
-
-  public void setListener(IEventListener listener) {
-    this.listener = listener;
-  }
-
-  public IEventListener getEventListener() {
-    return listener;
-  }
-
-  public void clearTimer() {
-    if (timerTask != null) {
-      timerTask.cancel();
-    }
-  }
 
   public String toString() {
     return "MessageImpl{" + "z" + commandCode + ", flags=" + flags + '}';
@@ -500,57 +471,5 @@ public class MessageImpl implements IMessage {
     }
   }    
 
-  protected static class TimerTask implements Runnable {
 
-    ScheduledFuture timerHandler;
-    MessageImpl message;
-    ScheduledExecutorService scheduledFacility;
-
-    public TimerTask(MessageImpl message) {
-      this.message = message;
-    }
-
-    public void setTimerHandler(ScheduledExecutorService scheduledFacility, ScheduledFuture timerHandler) {
-      this.scheduledFacility = scheduledFacility;
-      this.timerHandler = timerHandler;
-    }
-
-    public void run() {
-      try {
-        if (message != null && message.state != STATE_ANSWERED) {
-          IEventListener listener = null;
-          if (message.listener  instanceof IEventListener) {
-            listener = message.listener;
-          }
-          if (listener != null && listener.isValid()) {
-            if (message.peer != null) {
-              message.peer.remMessage(message);
-            }
-            message.listener.timeoutExpired(message);
-          }
-        }
-      }
-      catch(Throwable e) {
-        logger.debug("Can not process timeout", e);
-      }
-    }
-
-    public void cancel() {
-      if (timerHandler != null) {
-        timerHandler.cancel(true);
-        if (scheduledFacility instanceof ThreadPoolExecutor && timerHandler instanceof Runnable) {
-          ((ThreadPoolExecutor) scheduledFacility).remove((Runnable) timerHandler);
-        }
-      }
-      message = null;
-    }
-
-    public boolean isDone() {
-      return timerHandler != null && timerHandler.isDone();
-    }
-
-    public boolean isCancelled() {
-      return timerHandler == null || timerHandler.isCancelled();
-    }
-  }
 }

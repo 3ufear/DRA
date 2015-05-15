@@ -49,6 +49,17 @@ public interface Message extends Wrapper, Serializable {
   public static final int ABORT_SESSION_ANSWER = 274;
 
   /**
+     * The Credit-Control-Request message code
+   */
+  public static final int CREDIT_CONTROL_REQUEST = 272;
+
+    /**
+     * The Credit-Control-Answer message code
+     */
+    public static final int CREDIT_CONTROL_ANSWER = 272;
+
+
+    /**
    * The Accounting-Request message code
    */
   public static final int ACCOUNTING_REQUEST = 271;

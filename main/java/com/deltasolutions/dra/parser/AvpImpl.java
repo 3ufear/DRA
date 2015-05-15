@@ -57,6 +57,7 @@ public class AvpImpl implements Avp {
     //
     vendorID = vnd;
     rawData  = data;
+
   }
 
   AvpImpl(Avp avp) {

@@ -22,12 +22,6 @@
 
 package com.deltasolutions.dra.base;
 
-import com.deltasolutions.dra.base.ApplicationId;
-import com.deltasolutions.dra.base.IPeer;
-
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 /**
  * This interface extends basic message interface
  * Data: $Date: 2009/07/27 18:05:03 $
@@ -96,17 +90,6 @@ public interface IMessage extends IRequest, IAnswer {
    * @param timeOut value of timeout
    * @param timeUnit time unit
    */
-  void createTimer(ScheduledExecutorService scheduledFacility, long timeOut, TimeUnit timeUnit);
-
-  /**
-   * Execute timer task
-   */
-  void runTimer();
-
-  /**
-   * Cancel timer
-   */
-  void clearTimer();
 
   /**
    * Set hop by hop id
@@ -143,24 +126,6 @@ public interface IMessage extends IRequest, IAnswer {
    * @return application id
    */
   ApplicationId getSingleApplicationId(long id);
-
-  /**
-   * Check timeout
-   * @return true if request has timeout
-   */
-  boolean isTimeOut();
-
-  /**
-   * Set event listener
-   * @param listener event listener
-   */
-  void setListener(IEventListener listener);
-
-  /**
-   * Return event listener
-   * @return event listener
-   */
-  IEventListener getEventListener();
 
   /**
    * Return duplication key of message

@@ -48,7 +48,7 @@ public class MessageParser extends ElementParser implements IMessageParser {
 
 
   public MessageParser() {
-       System.out.println("INITIALIZE");
+
   }
 
   public IMessage createMessage(ByteBuffer data) throws AvpDataException {
@@ -63,7 +63,6 @@ public class MessageParser extends ElementParser implements IMessageParser {
         throw new Exception("Illegal value of version " + version);
       }
 
-        System.out.println("len - " + message.length + "   " + (tmp & 0x00FFFFFF));
       if (message.length != (tmp & 0x00FFFFFF)) {
         //throw new ParseException("Wrong length of data: " + (tmp & 0x00FFFFFF));
         throw new Exception("Wrong length of data: " + (tmp & 0x00FFFFFF));

@@ -32,7 +32,8 @@ class SocketProcessor implements Runnable {
 
     public void run() {
         try {
-            String[] Headers = readInputHeaders();
+            IMessage message = readMessage();
+            System.out.println("Flags:" + message.getFlags());
          //   HeaderProcessor Head = new HeaderProcessor(Headers);
          //   Head.ParseHeader();
          //   ResponseProcessor Response = new ResponseProcessor(Head, root);
@@ -67,35 +68,22 @@ class SocketProcessor implements Runnable {
         outstream.flush();
     }
 
-    private String[] readInputHeaders() throws Throwable {
+    private IMessage readMessage() throws Throwable {
         //BufferedReader br = new BufferedReader(new InputStreamReader(instream));
         byte[] a = new byte[DEFAULT_STORAGE_SIZE];
-        //a = br.
         ByteBuffer data;
         data = ByteBuffer.allocate(DEFAULT_STORAGE_SIZE);
-       // data.
-        //br.read(data);
-
 
 
         String[] buf = new String[10];
         int i = 0;
-        //while(true) {
         instream.read(a);
-            //String s = br.readLine();
-          //  if(s == null || s.trim().length() == 0) {
-          //      return buf;
-           // }
         data = ByteBuffer.wrap(a);
-        String s = new String(a,"cp1251");
-        System.out.println("count = " );
-        data.put(a);
-        System.out.println("count = " );
+        //String s = new String(a,"cp1251");
+        //data.put(a);
         data.position(0);
         int tmp = data.getInt();
-        System.out.println("count = " );
         data.position(0);
-        System.out.println("count = " );
         byte vers = (byte) (tmp >> 24);
         if (vers != 1) {
             return null;
@@ -103,34 +91,19 @@ class SocketProcessor implements Runnable {
         // extract the message length, so we know how much to read
         int messageLength = (tmp & 0xFFFFFF);
 
-
-      //  byte[] b;// = new byte[DEFAULT_STORAGE_SIZE];
-       // b = data.array();
-       //  for (i=0;i<b.length;i++) {
-       //         System.out.println(b[i]);
-       //  }
-            //System.out.println(s);
-            //buf[i] = ;
-       //     i++;
-
-       // }
         byte[] msg = new byte[messageLength];
         System.out.println("len: " + messageLength);
         data.get(msg);
         IMessage message =  parser.createMessage(ByteBuffer.wrap(msg));//parser.createMessage(data);
-        System.out.println("count = " );
         AvpSet set = message.getAvps();
-        System.out.println("count = " );
         AvpImpl avp = (AvpImpl) set.getAvpByIndex(1);
         Iterator<Avp> it = set.iterator();
         String str_1 = avp.getUTF8String();
-        System.out.println((("count = " + str_1)));
         int c = 0;
         while (it.hasNext()) {
             System.out.println(it.next().getUTF8String());
-
             c++;
         }
-        return buf;
+        return message;
     }
 }
