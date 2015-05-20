@@ -2372,13 +2372,6 @@ public interface Avp extends Wrapper, Serializable {
   String getDiameterIdentity() throws AvpDataException;
 
   /**
-   * @return data as an Diamter URI
-   * @throws AvpDataException
-   *           if data has incorrect format
-   */
-  URI getDiameterURI() throws AvpDataException;
-
-  /**
    * @return data as an AVP group.
    * @throws AvpDataException
    *           if data has incorrect format

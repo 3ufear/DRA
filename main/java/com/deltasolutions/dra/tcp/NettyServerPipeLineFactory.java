@@ -1,18 +1,15 @@
 package com.deltasolutions.dra.tcp;
 
 import com.deltasolutions.dra.tcp.Encoder.DiameterEncoder;
-import com.deltasolutions.dra.tcp.handlers.NettyServerHandler;
+import com.deltasolutions.dra.tcp.handlers.InboundHandler;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.socket.ClientSocketChannelFactory;
 
 import static org.jboss.netty.channel.Channels.pipeline;
 
 public class NettyServerPipeLineFactory implements ChannelPipelineFactory {
-    ClientSocketChannelFactory cf;
-    public NettyServerPipeLineFactory(ClientSocketChannelFactory cf) {
+    public NettyServerPipeLineFactory() {
         super();
-        this.cf = cf;
     }
 	public ChannelPipeline getPipeline() throws Exception {
 		// Create a default pipeline implementation.
@@ -25,7 +22,7 @@ public class NettyServerPipeLineFactory implements ChannelPipelineFactory {
 		//pipeline.addLast("encoder", new StringEncoder());
 		
 		// and then business logic.
-		pipeline.addLast("handler", new NettyServerHandler(cf));
+		pipeline.addLast("handler", new InboundHandler());
 		
 		return pipeline;
 	}	

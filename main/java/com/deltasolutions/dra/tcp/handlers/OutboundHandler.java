@@ -5,6 +5,7 @@ import com.deltasolutions.dra.base.IMessage;
 import com.deltasolutions.dra.base.Message;
 import com.deltasolutions.dra.base.ParseException;
 import com.deltasolutions.dra.chanelChooserHelper.ChanelChooser;
+import com.deltasolutions.dra.config.ProxyAgent;
 import com.deltasolutions.dra.parser.AvpSetImpl;
 import com.deltasolutions.dra.parser.MessageImpl;
 import com.deltasolutions.dra.tcp.ClientConnectionsPool;
@@ -25,28 +26,22 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
     private int resultCode;
     private Channel ch = null;
     private String name;
+    private int HopByHop = 123;
+    private int EndToEnd = 36363;
+    private boolean _debug = true;
 
     private ChanelChooser channelChooser = ChanelChooser.getInstance();//ServerConnectionsPool.getInstance();
     private ClientConnectionsPool ClientChannel = ClientConnectionsPool.getInstance();
 
-    public OutboundHandler() {
-        System.out.println("OUTBOUNDHANDLER");
-        this.resultCode = 2001;
-        this.originHost = "192.168.0.149";
-        this.originRealm = "vimpelcom.com";
-        this.vendorId = 12414;
-        this.productName = "DiamProxy";
-        this.appId = 1414145;
-    }
 
     public OutboundHandler(String name) {
-        System.out.println("OUTBOUNDHANDLER");
+        log("OUTBOUNDHANDLER");
         this.resultCode = 2001;
-        this.originHost = "192.168.0.149";
-        this.originRealm = "vimpelcom.com";
-        this.vendorId = 12414;
-        this.productName = "DiamProxy";
-        this.appId = 1414145;
+        this.originHost = ProxyAgent.originHost;
+        this.originRealm = ProxyAgent.originRealm;
+        this.vendorId = ProxyAgent.vendorId;
+        this.productName = ProxyAgent.productName;
+        this.appId = ProxyAgent.appId;
         this.name = name;
     }
 
@@ -69,7 +64,7 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
         set.addAvp(Avp.PRODUCT_NAME, productName, false);
         set.addAvp(Avp.AUTH_APPLICATION_ID, appId);
         set.addAvp(Avp.INBAND_SECURITY_ID, 0);
-        IMessage msg = new MessageImpl(Message.CAPABILITIES_EXCHANGE_REQUEST, appId, (short) 0,  21414, 33252, set);
+        IMessage msg = new MessageImpl(Message.CAPABILITIES_EXCHANGE_REQUEST, appId, (short) 0,  HopByHop, EndToEnd, set);
         msg.setRequest(true);
         return ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(msg));
     }
@@ -80,17 +75,17 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
         set.addAvp(Avp.ORIGIN_HOST, originHost, false);
         set.addAvp(Avp.ORIGIN_REALM, originRealm, false);
         set.addAvp(Avp.RESULT_CODE, resultCode);
-        IMessage msg = new MessageImpl(Message.DEVICE_WATCHDOG_ANSWER, appId, (short) 0,  21414, 33252, set);
+        IMessage msg = new MessageImpl(Message.DEVICE_WATCHDOG_ANSWER, appId, (short) 0,  HopByHop, EndToEnd, set);
         return ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(msg));
     }
 
     public void send(ByteBuffer msg) {
-        ChannelFuture f = ch.write(ChannelBuffers.wrappedBuffer(msg));
+            ChannelFuture f = ch.write(ChannelBuffers.wrappedBuffer(msg));
     }
 
     @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws ParseException {
-        System.out.println("Connected to server");
+        log("Connected to server");
         this.ch = e.getChannel();
         channelChooser.getPoolByName(name).setConnection(ch);
         ch.write(CER_msg());
@@ -101,71 +96,48 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
     public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e)
             throws Exception {
         IMessage msg = (IMessage) e.getMessage();
-        System.out.println("<<< " + " <<< " + msg.getCommandCode() + "  SSID " + msg.getSessionId());
+        log("<<<<<< " + msg.getCommandCode() + "  SSID " + msg.getSessionId());
         switch (msg.getCommandCode()) {
             case Message.CREDIT_CONTROL_ANSWER:
-                System.out.println("CCA ANSWER");
+                log("CCA ANSWER");
                 ch = ClientChannel.getConnection(msg.getSessionId());
                 System.out.println(ch);
                 send(DiameterEncoder.parser.encodeMessage(msg));
                 break;
             case Message.DEVICE_WATCHDOG_REQUEST:
-                System.out.println("DWA ANSWER");
+                log("DWA ANSWER");
                 e.getChannel().write(DWA_msg());
                 break;
             case Message.DISCONNECT_PEER_REQUEST:
+                log("DPA ANSWER");
         }
-      /*  if (msg.getCommandCode() == Message.CREDIT_CONTROL_ANSWER) {
-            System.out.println("CCA ANSWER");
-            ch = ClientChannel.getConnection(msg.getSessionId());
-            System.out.println(ch);
-            send(DiameterEncoder.parser.encodeMessage(msg));
-        } else if(msg.getCommandCode() == Message.DEVICE_WATCHDOG_REQUEST) {
-            System.out.println("DWA ANSWER");
-            e.getChannel().write(DWA_msg());
-        }*/
-      //  synchronized (trafficLock) {
-        /*    inboundChannel.write(ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(msg)));
-            // If inboundChannel is saturated, do not read until notified in
-            // HexDumpProxyInboundHandler.channelInterestChanged().
-            if (!inboundChannel.isWritable()) {
-               // e.getChannel().setReadable(false);
-            }
-      // }*/
-    }
-
-    @Override
-    public void channelInterestChanged(ChannelHandlerContext ctx,
-                                       ChannelStateEvent e) throws Exception {
-        // If outboundChannel is not saturated anymore, continue accepting
-        // the incoming traffic from the inboundChannel.
-      // synchronized (trafficLock) {
-            if (e.getChannel().isWritable()) {
-             //   inboundChannel.setReadable(true);
-            }
-      ///  }
-    }
-
+}
 
 
     @Override
     public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e)
             throws Exception {
-        System.out.println("Server channel closed" + ctx.getChannel().getRemoteAddress() + " id = " + ctx.getChannel().getId());
+        log("Server channel closed" + ctx.getChannel().getRemoteAddress() + " id = " + ctx.getChannel().getId());
        // closeOnFlush(inboundChannel);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
             throws Exception {
-        System.out.println("Server channel exception" + ctx.getChannel().getRemoteAddress() + " id = " + ctx.getChannel().getId());
+        log("Server channel exception" + ctx.getChannel().getRemoteAddress() + " id = " + ctx.getChannel().getId());
         e.getCause().printStackTrace();
         closeOnFlush(e.getChannel());
     }
     static void closeOnFlush(Channel ch) {
-        System.out.println("Server channel exception" + ch.getRemoteAddress() + " id = " + ch.getId());
+       // log("Server channel exception" + ch.getRemoteAddress() + " id = " + ch.getId());
         if (ch.isConnected()) {
             ch.write(ChannelBuffers.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
+        }
+    }
+
+    private void log(String txt) {
+        if (_debug) {
+            System.out.print("OutboundHandler: " + txt + "\n");
         }
     }
 }

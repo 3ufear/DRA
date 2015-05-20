@@ -4,11 +4,11 @@ package com.deltasolutions.dra.config;
  * Created by phil on 15-May-15.
  */
 public class ProxyAgent {
-    private String originHost = null;
-    private String originRealm = null;
-    private int vendorId = -1;
-    private String productName = null;
-    private int appId = -1;
+    public static String originHost = null;
+    public  static  String originRealm = null;
+    public  static int vendorId = -1;
+    public  static String productName = null;
+    public  static int appId = -1;
     private int port = -1;
 
     ProxyAgent() {//defaultvalues
@@ -36,7 +36,7 @@ public class ProxyAgent {
         this.originHost = originHost;
     }
 
-    public int getVendorId() {
+    public  int getVendorId() {
         return vendorId;
     }
 

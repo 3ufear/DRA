@@ -6,22 +6,18 @@ import com.deltasolutions.dra.tcp.NetContext;
 import org.jboss.netty.channel.*;
 import org.jboss.netty.channel.socket.ClientSocketChannelFactory;
 
-public class NettyServerHandler extends SimpleChannelUpstreamHandler {
-    ClientSocketChannelFactory cf;
+public class InboundHandler extends SimpleChannelUpstreamHandler {
 	private boolean _debug;
 	
-	public NettyServerHandler() {
-		_debug = true;
-	}
-    public  NettyServerHandler(ClientSocketChannelFactory cf) {
-        this.cf = cf;
+
+    public InboundHandler() {
         _debug = true;
 
     }
 
 	@Override
 	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		// Send greeting for a new connection.
+		//Send greeting for a new connection.
 		//e.getChannel().write("Welcome to " + InetAddress.getLocalHost().getHostName() + "!\r\n");
 		//e.getChannel().write("It is " + new Date() + " now.\r\n");
 		//log(e.toString());		
@@ -39,7 +35,7 @@ public class NettyServerHandler extends SimpleChannelUpstreamHandler {
         IMessage msg = (IMessage) e.getMessage();
 
 		try {
-			new CommandProcessorSmall("DiameterProcessor", new NetContext(e.getChannel(), msg), _debug, cf).start();
+			new CommandProcessorSmall("DiameterProcessor", new NetContext(e.getChannel(), msg), _debug).start();
 
 		} catch (Exception ex) {
 			ex.printStackTrace();

@@ -15,7 +15,7 @@ public class NettyServer {
 		ChannelFactory factory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
         ClientSocketChannelFactory cf = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
 	    ServerBootstrap bootstrap = new ServerBootstrap(factory);			    
-	    bootstrap.setPipelineFactory(new NettyServerPipeLineFactory(cf));
+	    bootstrap.setPipelineFactory(new NettyServerPipeLineFactory());
         bootstrap.setOption("receiveBufferSize", 20480);
         bootstrap.setOption("sendBufferSize", 20480);
 	    bootstrap.setOption("child.tcpNoDelay", true);
@@ -23,6 +23,6 @@ public class NettyServer {
 	    
 	    bootstrap.bind(new InetSocketAddress(port));	
 	    
-	    System.out.print("NettyServer: Listen to users on "+InetAddress.getLocalHost().toString()+":"+port+"\n");
+	    System.out.print("NettyServer: Listen to users on " + InetAddress.getLocalHost().toString()+":"+port+"\n");
 	}
 }

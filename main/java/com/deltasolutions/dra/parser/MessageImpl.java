@@ -59,7 +59,6 @@ public class MessageImpl implements IMessage {
 
   boolean isNetworkRequest = false;
 
-  transient IPeer peer;
 
   // Cached result for getApplicationIdAvps() method. It is called extensively and takes some time.
   // Potential place for dirt, but Application IDs don't change during message life time.
@@ -203,37 +202,7 @@ public class MessageImpl implements IMessage {
     }
   }
 
-  public Answer createAnswer() {
-    MessageImpl answer = new MessageImpl(this);
-    return answer;
-  }
 
-  public Answer createAnswer(long resultCode) {
-    MessageImpl answer = new MessageImpl(this);
-    try {
-      answer.getAvps().addAvp(Avp.RESULT_CODE, resultCode, true, false, true);
-    }
-    catch (Exception e) {
-      logger.debug("Can not create answer message", e);
-    }
-    //Its set in constructor.
-    //answer.setRequest(false);
-    return answer;
-  }
-
-  public Answer createAnswer(long vendorId, long experementalResultCode) {
-    MessageImpl answer = new MessageImpl(this);
-    try {
-      AvpSet exp_code = answer.getAvps().addGroupedAvp(297, true, false);
-      exp_code.addAvp(Avp.VENDOR_ID, vendorId, true, false, true);
-      exp_code.addAvp(Avp.EXPERIMENTAL_RESULT_CODE, experementalResultCode, true, false, true);
-    }
-    catch (Exception e) {
-      logger.debug("Can not create answer message", e);
-    }
-    answer.setRequest(false);
-    return answer;
-  }
 
   public long getApplicationId() {
     return applicationId;
@@ -351,7 +320,6 @@ public class MessageImpl implements IMessage {
     hopByHopId = request.hopByHopId;
     version    = request.version;
     flags      = request.flags;
-    peer       = request.peer;
   }
 
   public Avp getResultCode() {
@@ -389,14 +357,6 @@ public class MessageImpl implements IMessage {
 
   public void setEndToEndIdentifier(long endByEndId) {
     this.endToEndId = endByEndId;
-  }
-
-  public IPeer getPeer() {
-    return peer;
-  }
-
-  public void setPeer(IPeer peer) {
-    this.peer = peer; 
   }
 
   public int getState() {

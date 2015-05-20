@@ -22,17 +22,7 @@
 
 package com.deltasolutions.dra.base;
 
-/**
- * This interface extends basic message interface
- * Data: $Date: 2009/07/27 18:05:03 $
- * Revision: $Revision: 1.2 $
- * @version 1.5.0.1
- * 
- * @author erick.svenson@yahoo.com
- * @author <a href="mailto:brainslog@gmail.com"> Alexandre Mendonca </a>
- * @author <a href="mailto:baranowb@gmail.com"> Bartosz Baranowski </a>
- */
-public interface IMessage extends IRequest, IAnswer {
+public interface IMessage {
 
   /**
    * The message is not sent to the network
@@ -104,18 +94,6 @@ public interface IMessage extends IRequest, IAnswer {
   void setEndToEndIdentifier(long endByEndId);
 
   /**
-   * Return attached peer
-   * @return attached peer
-   */
-  IPeer getPeer();
-
-  /**
-   * Attach message to peer
-   * @param peer attached peer
-   */
-  void setPeer(IPeer peer);
-
-  /**
    * Return application id
    * @return application id
    */
@@ -146,4 +124,23 @@ public interface IMessage extends IRequest, IAnswer {
    * @return clone
    */
   Object clone();
+
+  AvpSet getAvps();
+
+  void setRequest(boolean request);
+
+  boolean isRequest();
+
+  long getHopByHopIdentifier();
+
+  long getEndToEndIdentifier();
+
+  int getCommandCode();
+
+  void setNetworkRequest(boolean isNetwork);
+
+  boolean isNetworkRequest();
+
+  String getSessionId();
+
 }

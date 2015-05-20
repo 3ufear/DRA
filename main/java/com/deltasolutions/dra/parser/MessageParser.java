@@ -88,21 +88,6 @@ public class MessageParser extends ElementParser implements IMessageParser {
     }
   }
 
-  public <T> T createMessage(Class<?> iface, ByteBuffer data) throws AvpDataException {
-    if (iface == IMessage.class) {
-        return (T) createMessage(data);
-    }
-    return null;
-  }
-
-  public <T> T createEmptyMessage(Class<?> iface, IMessage parentMessage) {
-    if (iface == Request.class) {
-      return (T) createEmptyMessage(parentMessage, parentMessage.getCommandCode());   
-    }
-    else {
-      return null;
-    }
-  }
 
   public IMessage createEmptyMessage(IMessage prnMessage) {
     return createEmptyMessage(prnMessage, prnMessage.getCommandCode());
@@ -260,12 +245,6 @@ public class MessageParser extends ElementParser implements IMessageParser {
     return new MessageImpl(commandCode, headerAppId);
   }
 
-  public <T> T createEmptyMessage(Class<?> iface, int commandCode, long headerAppId) {
-    if (iface == IRequest.class) {
-      return (T) new MessageImpl(commandCode, headerAppId);
-    }
-    return null;
-  }
 
 
   public int getNextEndToEndId() {

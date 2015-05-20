@@ -22,13 +22,14 @@
 
 package com.deltasolutions.dra.parser;
 
-import com.deltasolutions.dra.base.*;
+import com.deltasolutions.dra.base.Avp;
+import com.deltasolutions.dra.base.AvpDataException;
+import com.deltasolutions.dra.base.AvpSet;
+import com.deltasolutions.dra.base.InternalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
-import java.net.URISyntaxException;
-import java.net.UnknownServiceException;
 import java.util.Date;
 
 
@@ -202,17 +203,6 @@ public class AvpImpl implements Avp {
     }
   }
 
-  public URI getDiameterURI() throws AvpDataException {
-    try {
-      return new URI(parser.bytesToOctetString(rawData));
-    }
-    catch (URISyntaxException e) {
-      throw new AvpDataException(e, this);
-    }
-    catch (UnknownServiceException e) {
-      throw new AvpDataException(e, this);
-    }
-  }
 
   public AvpSet getGrouped() throws AvpDataException {
     try {

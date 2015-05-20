@@ -33,8 +33,6 @@ package com.deltasolutions.dra.parser;
 import com.deltasolutions.dra.base.Avp;
 import com.deltasolutions.dra.base.AvpSet;
 import com.deltasolutions.dra.base.InternalException;
-import com.deltasolutions.dra.base.URI;
-import com.deltasolutions.dra.base.ParseException;
 
 import java.net.InetAddress;
 import java.util.*;
@@ -343,37 +341,6 @@ public class AvpSetImpl implements AvpSet {
         }
     }
 
-    public Avp addAvp(int avpCode, URI value) {
-        try {
-            Avp res = new AvpImpl(avpCode, 0, 0, parser.octetStringToBytes(value.toString()));
-            this.avps.add(res);
-            return res;
-        } catch (ParseException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    public Avp addAvp(int avpCode, URI value, boolean mFlag, boolean pFlag) {
-        int flags = ((mFlag ? 0x40:0) | (pFlag ? 0x20:0));
-        try {
-            Avp res = new AvpImpl(avpCode, flags, 0, parser.octetStringToBytes(value.toString()));
-            this.avps.add(res);
-            return res;
-        } catch (ParseException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    public Avp addAvp(int avpCode, URI value, long vndId, boolean mFlag, boolean pFlag) {
-        int flags = ((vndId !=0 ? 0x80:0) | (mFlag ? 0x40:0) | (pFlag ? 0x20:0));
-        try {
-            Avp res = new AvpImpl(avpCode, flags, vndId, parser.octetStringToBytes(value.toString()));
-            this.avps.add(res);
-            return res;
-        } catch (ParseException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
 
     public Avp addAvp(int avpCode, InetAddress value) {
         Avp res = new AvpImpl(avpCode, 0, 0, parser.addressToBytes(value));
@@ -576,37 +543,6 @@ public class AvpSetImpl implements AvpSet {
         }
     }
 
-    public Avp insertAvp(int index, int avpCode, URI value) {
-        try {
-            Avp res = new AvpImpl(avpCode, 0, 0, parser.octetStringToBytes(value.toString()));
-            this.avps.add(index, res);
-            return res;
-        } catch(Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    public Avp insertAvp(int index, int avpCode, URI value, boolean mFlag, boolean pFlag) {
-        int flags = ((mFlag ? 0x40:0) | (pFlag ? 0x20:0));
-        try {
-            Avp res = new AvpImpl(avpCode, flags, 0, parser.octetStringToBytes(value.toString()));
-            this.avps.add(index, res);
-            return res;
-        } catch(Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    public Avp insertAvp(int index, int avpCode, URI value, long vndId, boolean mFlag, boolean pFlag) {
-        int flags = ((vndId !=0 ? 0x80:0) | (mFlag ? 0x40:0) | (pFlag ? 0x20:0));
-        try {
-            Avp res = new AvpImpl(avpCode, flags, vndId, parser.octetStringToBytes(value.toString()));
-            this.avps.add(index, res);
-            return res;
-        } catch(Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
 
     public Avp insertAvp(int index, int avpCode, InetAddress value) {
         Avp res = new AvpImpl(avpCode, 0, 0, parser.addressToBytes(value));

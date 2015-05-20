@@ -330,35 +330,6 @@ public interface AvpSet extends Iterable<Avp>, Serializable, Wrapper {
   Avp addAvp(int avpCode, String value, long vendorId, boolean mFlag, boolean pFlag, boolean asOctetString);
 
   /**
-   * Append URI AVP
-   * @param avpCode code of Avp
-   * @param value Avp data
-   * @return Avp instance
-   */
-  Avp addAvp(int avpCode, URI value);
-
-  /**
-   * Append URI AVP
-   * @param avpCode code of Avp
-   * @param value Avp data
-   * @param mFlag true set M flag/false clear M flag in header Avp
-   * @param pFlag true set P flag/false clear P flag in header Avp
-   * @return Avp instance
-   */
-  Avp addAvp(int avpCode, URI value, boolean mFlag, boolean pFlag);
-
-  /**
-   * Append URI AVP
-   * @param avpCode code of Avp
-   * @param value Avp data
-   * @param vendorId vendor of Avp
-   * @param mFlag true set M flag/false clear M flag in header Avp
-   * @param pFlag true set P flag/false clear P flag in header Avp
-   * @return Avp instance
-   */
-  Avp addAvp(int avpCode, URI value, long vendorId, boolean mFlag, boolean pFlag);
-
-  /**
    * Append Address AVP
    * @param avpCode code of Avp
    * @param value Avp data
@@ -686,37 +657,7 @@ public interface AvpSet extends Iterable<Avp>, Serializable, Wrapper {
    */
   Avp insertAvp(int index, int avpCode, String value, long vendorId, boolean mFlag, boolean pFlag, boolean asOctetString);
 
-  /**
-   * Insert URI AVP
-   * @param index index of inserted avp
-   * @param avpCode code of Avp
-   * @param value Avp data
-   * @return Avp instance
-   */
-  Avp insertAvp(int index, int avpCode, URI value);
 
-  /**
-   * Insert URI AVP
-   * @param index index of inserted avp
-   * @param avpCode code of Avp
-   * @param value Avp data
-   * @param mFlag true set M flag/false clear M flag in header Avp
-   * @param pFlag true set P flag/false clear P flag in header Avp
-   * @return Avp instance
-   */
-  Avp insertAvp(int index, int avpCode, URI value, boolean mFlag, boolean pFlag);
-
-  /**
-   * Insert URI AVP
-   * @param index index of inserted avp
-   * @param avpCode code of Avp
-   * @param value Avp data
-   * @param vendorId vendor of Avp
-   * @param mFlag true set M flag/false clear M flag in header Avp
-   * @param pFlag true set P flag/false clear P flag in header Avp
-   * @return Avp instance
-   */
-  Avp insertAvp(int index, int avpCode, URI value, long vendorId, boolean mFlag, boolean pFlag);
 
   /**
    * Insert Address AVP

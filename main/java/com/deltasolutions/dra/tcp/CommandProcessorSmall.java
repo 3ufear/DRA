@@ -1,9 +1,8 @@
 package com.deltasolutions.dra.tcp;
 
-import com.deltasolutions.dra.base.Avp;
-import com.deltasolutions.dra.base.IMessage;
-import com.deltasolutions.dra.base.Message;
-import com.deltasolutions.dra.base.ParseException;
+import com.deltasolutions.dra.base.*;
+import com.deltasolutions.dra.chanelChooserHelper.ChanelChooser;
+import com.deltasolutions.dra.config.ProxyAgent;
 import com.deltasolutions.dra.parser.AvpSetImpl;
 import com.deltasolutions.dra.parser.MessageImpl;
 import com.deltasolutions.dra.tcp.Encoder.DiameterEncoder;
@@ -12,31 +11,26 @@ import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.socket.ClientSocketChannelFactory;
 
 public class CommandProcessorSmall extends Thread {
 
-    public static final int DEFAULT_BUFFER_SIZE  = 1024;
 	private NetContext _nCtx;
 	private boolean _debug;
-    private final ClientSocketChannelFactory cf;
-    private volatile Channel outboundChannel;
-    String originHost = "192.168.1.153";//Заменить на данные из модуля конфига.
-    String originRealm = "vimpelcom.com";
+    String originHost = ProxyAgent.originHost;
+    String originRealm = ProxyAgent.originRealm;
     int resultCode = 2001;
-    int vendor_id = 124141;
-    String product_name = "DiamProxy";
-    int appId = 123;
+    int vendor_id = ProxyAgent.vendorId;
+    String product_name = ProxyAgent.productName;
+    int appId = ProxyAgent.appId;
     int InbandSecurityId = 0;
-    ServerConnectionsPool Channels = null;//ServerConnectionsPool.getInstance();
+    ChanelChooser channelChooser = ChanelChooser.getInstance();//ServerConnectionsPool.getInstance();
     ClientConnectionsPool ClientChannels = ClientConnectionsPool.getInstance();
 
 
 
-    public CommandProcessorSmall(String name, NetContext nCtx, boolean debug, ClientSocketChannelFactory cf) {
+    public CommandProcessorSmall(String name, NetContext nCtx, boolean debug) {
 		super();
 		setName(name);
-        this.cf = cf;
 		_nCtx = nCtx;
 		_debug = debug;
 	}
@@ -61,7 +55,6 @@ public class CommandProcessorSmall extends Thread {
         set.addAvp(299, InbandSecurityId);
         IMessage msg = new MessageImpl(Message.CAPABILITIES_EXCHANGE_ANSWER, appId, (short) 0,  _nCtx.message.getHopByHopIdentifier(), _nCtx.message.getEndToEndIdentifier(), set);
         //IMessage msg = (IMessage) _nCtx.message.createAnswer();
-
         return ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(msg));
     }
 
@@ -76,10 +69,8 @@ public class CommandProcessorSmall extends Thread {
 	
 	@Override
 	public void run() {
-       if (_debug) {
-            System.out.print("IN  > " + _nCtx.message + "\n");
-            System.out.println("COMMAND_CODE " + _nCtx.message.getCommandCode());
-       }
+       log("IN  > " + _nCtx.message + "\n");
+       log("COMMAND_CODE " + _nCtx.message.getCommandCode());
        try {
             switch (_nCtx.message.getCommandCode()) {
                 case Message.CAPABILITIES_EXCHANGE_REQUEST:
@@ -89,14 +80,11 @@ public class CommandProcessorSmall extends Thread {
                     _nCtx.channel.write(DWA_msg());
                     break;
                 case Message.CREDIT_CONTROL_REQUEST:
-                    Channel ch = Channels.getConnection();
+                    Channel ch = channelChooser.chooseChannel(_nCtx.message.getAvps());
                     ClientChannels.setConnection(_nCtx.message.getSessionId(), _nCtx.channel);
-                    if (_debug) {
-                        System.out.println(_nCtx.message.getSessionId() + "  CCAAnsewr");
-                    }
-                   // _nCtx.message.getAvps().getAvp()
                     _nCtx.message.getAvps().addAvp(Avp.ROUTE_RECORD, 636);
-                    ch.write(ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(_nCtx.message)));//ССR request;
+                        ch.write(ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(_nCtx.message)));//ССR request;
+                        log(_nCtx.message.getSessionId() + "  CCAAnsewr");
                     break;
                 case Message.DISCONNECT_PEER_REQUEST:
                     if (_debug) {
@@ -113,24 +101,17 @@ public class CommandProcessorSmall extends Thread {
                     });
                     break;
             }
-            /*      if (_nCtx.message.getCommandCode() == Message.CAPABILITIES_EXCHANGE_REQUEST) {
-                        //DiameterEncoder.parser;
-                        //Если пришел CER то отправляем CEA ANSWER
-
-                        //CEA Answer
-                    } else if (_nCtx.message.getCommandCode() == Message.CREDIT_CONTROL_ANSWER) {
-
-
-                        ClientChannels.setConnection(_nCtx.message.getSessionId(), _nCtx.channel);
-                        System.out.println(_nCtx.message.getSessionId() + "  CCAREQUEST");
-                        ch.write(ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(_nCtx.message)));//ССR request;
-                    } else if (_nCtx.message.getCommandCode() == Message.DEVICE_WATCHDOG_REQUEST) {
-
-                    }
-            }*/
-        } catch (ParseException e) {
+       } catch (ParseException e) {
             e.printStackTrace();
-        }
+       } catch (AvpDataException e) {
+           e.printStackTrace();
+       }
 
+    }
+
+    private void log(String txt) {
+        if (_debug) {
+            System.out.print("CommandProcessor(OutBoundHandler): " + txt + "\n");
+        }
     }
 }

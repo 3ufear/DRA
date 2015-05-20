@@ -25,17 +25,6 @@ package com.deltasolutions.dra.base;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * A Diameter message is either a request from a client to a server, or a response from a server to a client.
- * Both Request and Answer messages use the basic format of  RFC 3588
- * Wrapper interface allows adapt message to any driver vendor specific interface
- * The message must support adaptable operation to Answer and Request interfaces
- * Serializable interface allows use this class in SLEE Event objects
- * 
- * @author erick.svenson@yahoo.com
- * @author artem.litvinov@gmail.com 
- * @version 1.5.1 Final
- */
 public interface Message extends Wrapper, Serializable {
 
   /**
