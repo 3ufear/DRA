@@ -26,8 +26,6 @@ import com.deltasolutions.dra.base.Avp;
 import com.deltasolutions.dra.base.AvpDataException;
 import com.deltasolutions.dra.base.AvpSet;
 import com.deltasolutions.dra.base.InternalException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.util.Date;
@@ -46,8 +44,6 @@ public class AvpImpl implements Avp {
 
   byte[] rawData = new byte[0];
   AvpSet groupedData;
-
-  private static final Logger logger = LoggerFactory.getLogger(AvpImpl.class);
 
   AvpImpl(int code, int flags, long vnd, byte[] data) {
     avpCode  = code;
@@ -74,7 +70,7 @@ public class AvpImpl implements Avp {
       }
     }
     catch (AvpDataException e) {
-      logger.debug("Can not create Avp", e);
+
     }
   }
 

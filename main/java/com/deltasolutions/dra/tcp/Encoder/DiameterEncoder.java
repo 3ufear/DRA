@@ -16,13 +16,13 @@ public class DiameterEncoder extends FrameDecoder {
         int tmp = channelBuffer.toByteBuffer().getInt();
         //channelBuffer.
         //data.position(0);
+        //System.out.println(channelBuffer.toString());
         byte vers = (byte) (tmp >> 24);
         // extract the message length, so we know how much to read
         int messageLength = (tmp & 0xFFFFFF);
         if (messageLength < channelBuffer.readableBytes()) {
             return null;
         }
-        System.out.println("MSGLEN = " + messageLength);
         return parser.createMessage(channelBuffer.readBytes(messageLength).toByteBuffer());
     }
 }

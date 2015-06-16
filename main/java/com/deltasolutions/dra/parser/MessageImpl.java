@@ -33,13 +33,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Represents a Diameter message.
- * 
- * @author erick.svenson@yahoo.com
- * @author <a href="mailto:brainslog@gmail.com"> Alexandre Mendonca </a>
- * @author <a href="mailto:baranowb@gmail.com"> Bartosz Baranowski </a>
- */
 public class MessageImpl implements IMessage {
 
   private static final long serialVersionUID = 1L;
@@ -124,7 +117,7 @@ public class MessageImpl implements IMessage {
    * 
    * @param request parent request
    */
-  private MessageImpl(MessageImpl request) {
+  public MessageImpl(MessageImpl request) {
     this(request.getCommandCode(), request.getHeaderApplicationId());
     copyHeader(request);
     setRequest(false);

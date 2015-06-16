@@ -4,7 +4,6 @@ import com.deltasolutions.dra.base.IMessage;
 import com.deltasolutions.dra.tcp.CommandProcessorSmall;
 import com.deltasolutions.dra.tcp.NetContext;
 import org.jboss.netty.channel.*;
-import org.jboss.netty.channel.socket.ClientSocketChannelFactory;
 
 public class InboundHandler extends SimpleChannelUpstreamHandler {
 	private boolean _debug;
@@ -44,7 +43,7 @@ public class InboundHandler extends SimpleChannelUpstreamHandler {
 	
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-		log("Error ("+ctx.getChannel().getRemoteAddress()+"): "+e.getCause().fillInStackTrace().getStackTrace() +" ("+ctx.getChannel().getId()+")");
+		log("Error ("+ctx.getChannel().getRemoteAddress()+"): "+e.getCause() +" ("+ctx.getChannel().getId()+")");
 	}	
 	
 	private void log(String txt) {

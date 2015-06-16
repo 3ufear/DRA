@@ -13,18 +13,6 @@ public class ConfigCondition {
     public static final int EQUIALS_STRING = 7;//eq
     public static final int NOT_EQUIALS_STRING = 8;//ne;
 
-    public int getAvpCode() {
-        return avpCode;
-    }
-
-    public int getCondititionCode() {
-        return condititionCode;
-    }
-
-    public String getConditionValue() {
-        return conditionValue;
-    }
-
     private int avpCode = 0;
 
     private int condititionCode = 0;
@@ -62,6 +50,18 @@ public class ConfigCondition {
         }else if (conditionCode.equals("ne")) {
             this.condititionCode = NOT_EQUIALS_STRING;
         }
+    }
+
+    public int getAvpCode() {
+        return avpCode;
+    }
+
+    public int getCondititionCode() {
+        return condititionCode;
+    }
+
+    public String getConditionValue() {
+        return conditionValue;
     }
 
     public String getConditionResultName() {

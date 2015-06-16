@@ -35,7 +35,6 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
 
 
     public OutboundHandler(String name) {
-        log("OUTBOUNDHANDLER");
         this.resultCode = 2001;
         this.originHost = ProxyAgent.originHost;
         this.originRealm = ProxyAgent.originRealm;
@@ -101,7 +100,6 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
             case Message.CREDIT_CONTROL_ANSWER:
                 log("CCA ANSWER");
                 ch = ClientChannel.getConnection(msg.getSessionId());
-                System.out.println(ch);
                 send(DiameterEncoder.parser.encodeMessage(msg));
                 break;
             case Message.DEVICE_WATCHDOG_REQUEST:
@@ -117,16 +115,15 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e)
             throws Exception {
-        log("Server channel closed" + ctx.getChannel().getRemoteAddress() + " id = " + ctx.getChannel().getId());
+        log("Server channel closed " + ctx.getChannel().getRemoteAddress() + " id = " + ctx.getChannel().getId());
        // closeOnFlush(inboundChannel);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
             throws Exception {
-        log("Server channel exception" + ctx.getChannel().getRemoteAddress() + " id = " + ctx.getChannel().getId());
-        e.getCause().printStackTrace();
-        closeOnFlush(e.getChannel());
+        log("Server channel exception" + ctx.getChannel().getRemoteAddress() + e.getCause() + " id = " + ctx.getChannel().getId());
+      //  closeOnFlush(e.getChannel());
     }
     static void closeOnFlush(Channel ch) {
        // log("Server channel exception" + ch.getRemoteAddress() + " id = " + ch.getId());

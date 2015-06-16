@@ -63,6 +63,7 @@ public class ChanelChooser {
     public Channel chooseChannel(AvpSet avps) throws AvpDataException {
 
         if (conditionList.size() == 0) {
+            //System.out.println(map.get(this.defaultName).toString());
             return map.get(this.defaultName).getConnection();
         } else {
             Iterator it = conditionList.iterator();

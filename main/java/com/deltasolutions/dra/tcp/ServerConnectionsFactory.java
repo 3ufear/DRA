@@ -16,17 +16,13 @@ import java.util.concurrent.Executors;
 public class ServerConnectionsFactory extends Thread {
     private String remoteHost;
     private int remotePort;
-    private String realm;
-    private String productName;
-    private ClientBootstrap cb;
+    private ClientBootstrap clientBootstrap;
     private String name;
 
     public ServerConnectionsFactory() {
         remoteHost = "localhost";
         remotePort = 8080;
-
-        realm = "DiamRealm";
-        productName = "DiameterProxy";
+        name = "defaultName";
     }
 
     public ServerConnectionsFactory(String host, String name) {
@@ -40,13 +36,13 @@ public class ServerConnectionsFactory extends Thread {
     public void run() {
        // ChannelFactory factory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
         ClientSocketChannelFactory cf = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
-        cb = new ClientBootstrap(cf);
-        cb.getPipeline().addLast("framer", new DiameterEncoder());
-        cb.getPipeline().addLast("handler", new OutboundHandler(name));
-        ChannelFuture f = cb.connect(new InetSocketAddress(remoteHost, remotePort));
+        clientBootstrap = new ClientBootstrap(cf);
+        clientBootstrap.getPipeline().addLast("framer", new DiameterEncoder());
+        clientBootstrap.getPipeline().addLast("handler", new OutboundHandler(name));
+        ChannelFuture f = clientBootstrap.connect(new InetSocketAddress(remoteHost, remotePort));
         f.getChannel().getCloseFuture().awaitUninterruptibly();
-        // Shut down thread pools to exit.
-        cb.releaseExternalResources();
+        //Shut down thread pools to exit.
+        clientBootstrap.releaseExternalResources();
     }
 }
 

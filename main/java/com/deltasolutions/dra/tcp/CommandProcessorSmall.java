@@ -30,9 +30,9 @@ public class CommandProcessorSmall extends Thread {
 
     public CommandProcessorSmall(String name, NetContext nCtx, boolean debug) {
 		super();
-		setName(name);
+	//	setName(name);
 		_nCtx = nCtx;
-		_debug = debug;
+		_debug = true;
 	}
 
     private ChannelBuffer DWA_msg() throws ParseException {
@@ -66,8 +66,18 @@ public class CommandProcessorSmall extends Thread {
         IMessage msg = new MessageImpl(Message.DISCONNECT_PEER_ANSWER, appId, (short) 0,  _nCtx.message.getHopByHopIdentifier(), _nCtx.message.getEndToEndIdentifier(), set);
         return ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(msg));
     }
-	
-	@Override
+
+    private ChannelBuffer CCA_msg(MessageImpl msg) throws ParseException {
+        IMessage message = new MessageImpl(msg);
+        AvpSetImpl set = new AvpSetImpl();
+        set.addAvp(264, originHost, false);
+        set.addAvp(296, originRealm, false);
+        set.addAvp(268, resultCode);
+        message.setRequest(false);
+      //  IMessage msg = new MessageImpl(Message.CREDIT_CONTROL_ANSWER, appId, (short) 0,  _nCtx.message.getHopByHopIdentifier(), _nCtx.message.getEndToEndIdentifier(), set);
+        return ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(message));
+    }
+    @Override
 	public void run() {
        log("IN  > " + _nCtx.message + "\n");
        log("COMMAND_CODE " + _nCtx.message.getCommandCode());
@@ -83,13 +93,14 @@ public class CommandProcessorSmall extends Thread {
                     Channel ch = channelChooser.chooseChannel(_nCtx.message.getAvps());
                     ClientChannels.setConnection(_nCtx.message.getSessionId(), _nCtx.channel);
                     _nCtx.message.getAvps().addAvp(Avp.ROUTE_RECORD, 636);
-                        ch.write(ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(_nCtx.message)));//ССR request;
-                        log(_nCtx.message.getSessionId() + "  CCAAnsewr");
+                    ch.write(ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(_nCtx.message)));//ССR request;
+                        log(_nCtx.message.getSessionId() + "  CCAAnswer");
+                        //_nCtx.channel.write(CCA_msg((MessageImpl)_nCtx.message));
                     break;
                 case Message.DISCONNECT_PEER_REQUEST:
                     if (_debug) {
-                        System.out.println("DPA Answer");
-                        System.out.println(_nCtx.message.getSessionId() + "  DPAAnswer");
+                        log("DPA Answer");
+                        log(_nCtx.message.getSessionId() + "  DPAAnswer");
                     }
                     ChannelFuture f = _nCtx.channel.write(DPA_msg());
                    // _nCtx.channel.disconnect();
@@ -102,16 +113,15 @@ public class CommandProcessorSmall extends Thread {
                     break;
             }
        } catch (ParseException e) {
-            e.printStackTrace();
+           e.printStackTrace();
        } catch (AvpDataException e) {
            e.printStackTrace();
        }
-
     }
 
     private void log(String txt) {
         if (_debug) {
-            System.out.print("CommandProcessor(OutBoundHandler): " + txt + "\n");
+            System.out.print("CommandProcessor(InBoundHandler): " + txt + "\n");
         }
     }
 }

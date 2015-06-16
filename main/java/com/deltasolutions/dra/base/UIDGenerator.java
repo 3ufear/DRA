@@ -25,13 +25,6 @@ package com.deltasolutions.dra.base;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * This class provide uid range generator functionality
- * 
- * @author erick.svenson@yahoo.com
- * @author <a href="mailto:brainslog@gmail.com"> Alexandre Mendonca </a>
- * @author <a href="mailto:baranowb@gmail.com"> Bartosz Baranowski </a>
- */
 public class UIDGenerator {  // todo remove or redesign
 
   private /*static*/ long value; // static causes repetitions

@@ -47,20 +47,16 @@ public class Config {
                 if (flagIsBegining) {
                     String buf[] = s.split(" ");
                     //buf = disposeFromSpaces(buf);
-                    System.out.println("isBeginig");
                     if (buf[0].toLowerCase().equals("upstream")) {
-                        System.out.println("isUpstream");
                         flagIsUpstream = true;
                         upstream = new Upstream(buf[1]);
                         if (buf.length == 3) {
-                            //          System.out.println("LeftBracket");
                             if (buf[2].equals("{")) {
                                 flagIsLeftBracket = true;
                             }
                         }
                         flagIsBegining = false;
                     } else if (buf[0].toLowerCase().equals("proxyagent")) {
-                        System.out.println("PROXYAGENT");
                         flagIsBegining = false;
                         flagIsProxyAgent = true;
                         if (buf.length > 1) {
@@ -70,16 +66,13 @@ public class Config {
                         }
                     }
                 } else if (flagIsUpstream) {
-                    //   System.out.println("AfterBeginig");
                     if (flagIsLeftBracket) {
                         if (s.equals("}")) {
-                            //      System.out.println("}}}");
                             upstreamList.add(upstream);
                             flagIsLeftBracket = false;
                             flagIsUpstream = false;
                             flagIsBegining = true;
                         } else {
-                            //   System.out.println("addHosts");
                             String[] str = s.split(" ");
                            // str = disposeFromSpaces(str);
                             if (str.length < 3)
