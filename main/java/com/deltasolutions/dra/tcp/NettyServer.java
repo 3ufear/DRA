@@ -15,12 +15,12 @@ public class NettyServer {
 	    ServerBootstrap bootstrap = new ServerBootstrap(factory);			    
 	    bootstrap.setPipelineFactory(new NettyServerPipeLineFactory());
         bootstrap.setOption("receiveBufferSize", 20480);
-        bootstrap.setOption("sendBufferSize", 20480);
+        bootstrap.setOption("sendBufferSize", 1);
 	    bootstrap.setOption("child.tcpNoDelay", true);
 	    bootstrap.setOption("child.keepAlive", true);
 	    
 	    bootstrap.bind(new InetSocketAddress(port));	
 	    
-	    System.out.print("NettyServer: Listen to users on " + InetAddress.getLocalHost().toString()+":"+port+"\n");
+	    System.out.print("NettyServer: Listen to users on  port :"+port+"\n");
 	}
 }

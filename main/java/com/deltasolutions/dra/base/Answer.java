@@ -31,6 +31,7 @@ package com.deltasolutions.dra.base;
  */
 public interface Answer extends Message {
 
+
   /**
    * @return ResultCode Avp from message
    */

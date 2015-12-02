@@ -75,7 +75,9 @@ public class Config {
                         } else {
                             String[] str = s.split(" ");
                            // str = disposeFromSpaces(str);
-                            if (str.length < 3)
+                            if (str[0].toLowerCase().equals("failover")) {
+                                upstream.setFailoverUpstream(str[1]);
+                            } else if (str.length < 3)
                                 upstream.addHost(str[0]);
                             else
                                 throw new ParseException("Unexpected string:" + s + ". 2 parameters must be defined. ");
@@ -118,6 +120,8 @@ public class Config {
                                 agent.setProductName(str[1]);
                             } else if (str[0].toLowerCase().equals("appid")) {
                                 agent.setAppId(Integer.parseInt(str[1]));
+                            } else if (str[0].toLowerCase().equals("errorresultcodes")) {
+                                agent.setErrorResultCodes(str[1].split(","));
                             } else if (str[0].toLowerCase().equals("default:")) {
                                 if (str.length >= 2) {
                                     this.setDefaultUpstream(str[1]);

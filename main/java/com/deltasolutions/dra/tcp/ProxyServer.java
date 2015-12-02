@@ -16,7 +16,8 @@ public class ProxyServer {
       /*  if (args.length < 1) {
             System.out.println("Usage: <port>");
         } else {*/
-        Config conf = new Config("C:\\Users\\phil\\Documents\\WORK\\Diamter Routing Agent\\proxyagent.conf");
+       // Config conf = new Config("/opt/diametriq/dre/config/proxyagent.conf");
+        Config conf = new Config("./proxyagent.conf");
         conf.parseConfig();
         ChanelChooser.getInstance().processUpstreams(conf.getUpstreamList(), conf.getConfigConditionList());
          /*   for (int i =0; i < hosts.length; i++) {

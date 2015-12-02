@@ -103,7 +103,15 @@ public class AvpDataException extends Exception {
     super(cause);
   }
 
-  public Avp getAvp() {
+    public AvpDataException(String message, int code, long vendorId) {
+
+    }
+
+    public AvpDataException(String s, AvpDataException e, int code, long vendor) {
+
+    }
+
+    public Avp getAvp() {
     return avp;
   }
 

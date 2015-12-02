@@ -47,7 +47,8 @@ public interface Message extends Wrapper, Serializable {
      */
     public static final int CREDIT_CONTROL_ANSWER = 272;
 
-
+  public static final int ULAR_REQUEST = 316;//16777551
+  public static final int ULAR_ANSWER = 316;
     /**
    * The Accounting-Request message code
    */
@@ -107,6 +108,8 @@ public interface Message extends Wrapper, Serializable {
    * The Session-Termination-Answer message code
    */
   public static final int SESSION_TERMINATION_ANSWER = 275;
+
+  public static final int AA = 265;
 
   /**
    * @return version of message (version filed in header)

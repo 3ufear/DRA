@@ -8,6 +8,7 @@ import org.jboss.netty.channel.socket.ClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.concurrent.Executors;
 
 /**
@@ -18,6 +19,7 @@ public class ServerConnectionsFactory extends Thread {
     private int remotePort;
     private ClientBootstrap clientBootstrap;
     private String name;
+    public static int port = 30000;
 
     public ServerConnectionsFactory() {
         remoteHost = "localhost";
@@ -37,9 +39,14 @@ public class ServerConnectionsFactory extends Thread {
        // ChannelFactory factory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
         ClientSocketChannelFactory cf = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
         clientBootstrap = new ClientBootstrap(cf);
+      //  clientBootstrap.setOption("receiveBufferSize", 20480);
+        clientBootstrap.setOption("sendBufferSize", 1);
         clientBootstrap.getPipeline().addLast("framer", new DiameterEncoder());
         clientBootstrap.getPipeline().addLast("handler", new OutboundHandler(name));
-        ChannelFuture f = clientBootstrap.connect(new InetSocketAddress(remoteHost, remotePort));
+
+        ChannelFuture f = clientBootstrap.connect(new InetSocketAddress(remoteHost, remotePort));//, new InetSocketAddress("10.169.17.68", port));
+
+
         f.getChannel().getCloseFuture().awaitUninterruptibly();
         //Shut down thread pools to exit.
         clientBootstrap.releaseExternalResources();

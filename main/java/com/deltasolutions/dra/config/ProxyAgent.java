@@ -1,5 +1,7 @@
 package com.deltasolutions.dra.config;
 
+import java.util.HashSet;
+
 /**
  * Created by phil on 15-May-15.
  */
@@ -10,6 +12,7 @@ public class ProxyAgent {
     public  static String productName = null;
     public  static int appId = -1;
     private int port = -1;
+    public static HashSet<Integer> errorResultCodes;
 
     ProxyAgent() {//defaultvalues
       /*  originHost = "originHost.com";
@@ -76,4 +79,10 @@ public class ProxyAgent {
         this.port = port;
     }
 
+    public void setErrorResultCodes(String[] codes) {
+        errorResultCodes = new HashSet<Integer>(codes.length);
+        for (int i = 0; i < codes.length; i++ ) {
+            errorResultCodes.add(Integer.parseInt(codes[i]));
+        }
+    }
 }

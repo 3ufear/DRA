@@ -1,6 +1,5 @@
 package com.deltasolutions.dra.chanelChooserHelper;
 
-import com.deltasolutions.dra.base.AvpDataException;
 import com.deltasolutions.dra.base.AvpSet;
 import com.deltasolutions.dra.config.ConfigCondition;
 import com.deltasolutions.dra.config.Upstream;
@@ -37,13 +36,25 @@ public class ChanelChooser {
             Upstream up =(Upstream) it.next();
             if (up.isActive()) {
                 ServerConnectionsPool serverpool = new ServerConnectionsPool();
+                serverpool.setFailoverConnectionName(up.getFailoverUpstream());
                 map.put(up.getName(),serverpool);
                 if (up.isDefault()) {
                      this.defaultName = up.getName();
                 }
+                int port = 30000;
                 for (int i = 0; i < up.getHosts().length; i++) {
+
                     ServerConnectionsFactory factory = new ServerConnectionsFactory(up.getHosts()[i], up.getName());
+                    factory.port = port;
                     factory.start();
+                    port += 10500;
+                    System.out.println("PORT " + port);
+                    try {
+
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -60,21 +71,20 @@ public class ChanelChooser {
         return instance;
     }
 
-    public Channel chooseChannel(AvpSet avps) throws AvpDataException {
+    public ServerConnectionsPool chooseChannel(AvpSet avps) throws Exception {
 
         if (conditionList.size() == 0) {
-            //System.out.println(map.get(this.defaultName).toString());
-            return map.get(this.defaultName).getConnection();
+            return map.get(this.defaultName);
         } else {
             Iterator it = conditionList.iterator();
             ConditionHelper cond;
             while (it.hasNext()) {
                 cond = (ConditionHelper) it.next();
                 if (cond.checkCondition(avps)) {
-                    return map.get(cond.getUpstreamName()).getConnection();
+                    return map.get(cond.getUpstreamName());
                 }
             }
         }
-        return null;
+        return map.get(this.defaultName);
     }
 }

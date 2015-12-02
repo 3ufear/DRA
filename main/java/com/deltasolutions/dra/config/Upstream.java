@@ -13,6 +13,7 @@ public class Upstream {
     private boolean isActive = false;
     private String name;
     private List<String> hosts = new ArrayList<String>();
+    private String failoverUpstream;
 
     Upstream() {
         name = null;
@@ -64,5 +65,14 @@ public class Upstream {
         }
         return str;
     }
+
+    public void setFailoverUpstream(String name) {
+        failoverUpstream = name;
+    }
+
+    public String getFailoverUpstream() {
+        return  failoverUpstream;
+    }
+
 
 }

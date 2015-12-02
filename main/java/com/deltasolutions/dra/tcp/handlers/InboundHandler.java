@@ -1,9 +1,16 @@
 package com.deltasolutions.dra.tcp.handlers;
 
+import com.deltasolutions.dra.base.AvpDataException;
 import com.deltasolutions.dra.base.IMessage;
-import com.deltasolutions.dra.tcp.CommandProcessorSmall;
+import com.deltasolutions.dra.tcp.CommandProcessor;
+import com.deltasolutions.dra.tcp.Encoder.DiameterEncoder;
 import com.deltasolutions.dra.tcp.NetContext;
+import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.*;
+
+import javax.xml.crypto.Data;
+import java.nio.ByteBuffer;
+import java.util.Date;
 
 public class InboundHandler extends SimpleChannelUpstreamHandler {
 	private boolean _debug;
@@ -30,11 +37,18 @@ public class InboundHandler extends SimpleChannelUpstreamHandler {
 	}
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        IMessage msg = (IMessage) e.getMessage();
-
+	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws AvpDataException {
+		/*ChannelBuffer bf = (ChannelBuffer) e.getMessage();
+        IMessage msg = null;
 		try {
-			new CommandProcessorSmall("DiameterProcessor", new NetContext(e.getChannel(), msg), _debug).start();
+			msg = DiameterEncoder.parser.createMessage(bf.toByteBuffer());  //.readBytes(messageLength).toByteBuffer());
+		} catch (AvpDataException e1) {
+
+			throw e1;
+		}*/
+		 IMessage msg = (IMessage) e.getMessage();
+		try {
+			new CommandProcessor("DiameterProcessor", new NetContext(e.getChannel(), msg), _debug).run();
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -43,12 +57,13 @@ public class InboundHandler extends SimpleChannelUpstreamHandler {
 	
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-		log("Error ("+ctx.getChannel().getRemoteAddress()+"): "+e.getCause() +" ("+ctx.getChannel().getId()+")");
+		log("Error ("+ctx.getChannel().getRemoteAddress()+"): " + e.getCause() + " ("+ctx.getChannel().getId()+")");
 	}	
 	
 	private void log(String txt) {
 		if (_debug) {
-			System.out.print("NettyServerHandler: "+txt+"\n");
+			Date curdate = new Date();
+			System.out.print(curdate + "  InBoundHandler: " + txt + "\n");
 		}
 	}
 }

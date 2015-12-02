@@ -13,19 +13,14 @@ import java.util.List;
 public class ServerConnectionsPool {
     private List<Channel> ServerConnections = new ArrayList<Channel>();
     private BalanceAlgorithm balance = new WeightedRoundRobin(ServerConnections);
+    private String failoverUpstream;
 
     public ServerConnectionsPool() {
 
     }
 
-    public Channel getConnection() {
-        try {
+    public Channel getConnection () throws Exception {
             return balance.getNextConnection();
-        } catch (Exception e) {
-            log(e.getMessage());
-            e.printStackTrace();
-        }
-        return null;
     }
     public void setConnection(Channel ch) {
         setConnection(ch, 1);
@@ -41,6 +36,14 @@ public class ServerConnectionsPool {
     private void log(String log) {
         System.out.println("ServerConnectionsPool: " + log);
     }
+    public void setFailoverConnectionName(String name) {
+        failoverUpstream = name;
+    }
 
+
+
+    public String getFailoverUpstream() {
+        return failoverUpstream;
+    }
 
 }
