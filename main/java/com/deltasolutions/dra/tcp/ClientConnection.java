@@ -2,7 +2,8 @@ package com.deltasolutions.dra.tcp;
 
 import com.deltasolutions.dra.base.IMessage;
 import com.deltasolutions.dra.base.Message;
-import org.jboss.netty.channel.Channel;
+import io.netty.channel.Channel;
+
 
 /**
  * Created by phil on 11/8/2015.

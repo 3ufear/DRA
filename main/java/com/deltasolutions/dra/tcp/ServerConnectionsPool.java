@@ -2,7 +2,8 @@ package com.deltasolutions.dra.tcp;
 
 import com.deltasolutions.dra.chanelChooserHelper.balanceAlgorithm.BalanceAlgorithm;
 import com.deltasolutions.dra.chanelChooserHelper.balanceAlgorithm.WeightedRoundRobin;
-import org.jboss.netty.channel.Channel;
+import io.netty.channel.Channel;
+
 
 import java.util.ArrayList;
 import java.util.List;

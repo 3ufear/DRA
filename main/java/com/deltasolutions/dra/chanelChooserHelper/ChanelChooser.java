@@ -5,7 +5,7 @@ import com.deltasolutions.dra.config.ConfigCondition;
 import com.deltasolutions.dra.config.Upstream;
 import com.deltasolutions.dra.tcp.ServerConnectionsFactory;
 import com.deltasolutions.dra.tcp.ServerConnectionsPool;
-import org.jboss.netty.channel.Channel;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;

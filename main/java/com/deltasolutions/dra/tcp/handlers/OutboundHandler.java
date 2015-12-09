@@ -8,16 +8,14 @@ import com.deltasolutions.dra.parser.MessageImpl;
 import com.deltasolutions.dra.tcp.ClientConnection;
 import com.deltasolutions.dra.tcp.ClientConnectionsPool;
 import com.deltasolutions.dra.tcp.Encoder.DiameterEncoder;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.*;
+import io.netty.channel.*;
 
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.HashSet;
 
-public class OutboundHandler extends SimpleChannelUpstreamHandler {
+public class OutboundHandler extends ChannelInboundHandlerAdapter {
 
     private String originHost;
     private String originRealm;
@@ -59,7 +57,7 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
     }
 
 
-    private ChannelBuffer CER_msg() throws ParseException {
+    private ByteBuffer CER_msg() throws ParseException {
         AvpSetImpl set = new AvpSetImpl();
         set.addAvp(Avp.ORIGIN_HOST, originHost, false);
         set.addAvp(Avp.ORIGIN_REALM, originRealm, false);
@@ -88,36 +86,36 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
         IMessage msg = new MessageImpl(Message.CAPABILITIES_EXCHANGE_REQUEST, 0, (short) 0,  HopByHop, EndToEnd, set);
 
         msg.setRequest(true);
-        return ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(msg));
+        return (DiameterEncoder.parser.encodeMessage(msg));
     }
 
 
-    private ChannelBuffer DWA_msg(int HopByHop, int EndToEnd) throws ParseException {
+    private ByteBuffer DWA_msg(int HopByHop, int EndToEnd) throws ParseException {
         AvpSetImpl set = new AvpSetImpl();
         set.addAvp(Avp.ORIGIN_HOST, originHost, false);
         set.addAvp(Avp.ORIGIN_REALM, originRealm, false);
         set.addAvp(Avp.RESULT_CODE, resultCode);
         IMessage msg = new MessageImpl(Message.DEVICE_WATCHDOG_ANSWER, appId, (short) 0,  HopByHop, EndToEnd, set);
-        return ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(msg));
+        return (DiameterEncoder.parser.encodeMessage(msg));
     }
 
     public void send(Channel ch, ByteBuffer msg) {
-            ChannelFuture f = ch.write(ChannelBuffers.wrappedBuffer(msg));
+            ChannelFuture f = ch.write(msg);
     }
 
     @Override
-    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws ParseException {
+    public void channelActive(ChannelHandlerContext ctx) throws ParseException {
         log("Connected to server");
-        this.ch = e.getChannel();
+        this.ch = ctx.channel();
         channelChooser.getPoolByName(name).setConnection(ch);
         ch.write(CER_msg());
     }
 
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e)
+    public void channelRead(ChannelHandlerContext ctx, Object ms)
             throws Exception {
-        IMessage msg = (IMessage) e.getMessage();
+        IMessage msg = (IMessage) ms;
         synchronized (ch) {
             switch (msg.getCommandCode()) {
                 case Message.CREDIT_CONTROL_ANSWER:
@@ -171,8 +169,8 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
                     break;
                 case Message.DEVICE_WATCHDOG_REQUEST:
                     if (msg.isRequest()) {
-                        log("DWA ANSWER " + e.getRemoteAddress());
-                        e.getChannel().write(DWA_msg((int) msg.getHopByHopIdentifier(), (int) msg.getEndToEndIdentifier()));
+                        log("DWA ANSWER " + ctx.channel().remoteAddress());
+                        ctx.channel().write(DWA_msg((int) msg.getHopByHopIdentifier(), (int) msg.getEndToEndIdentifier()));
                     }
                     break;
                 case Message.DISCONNECT_PEER_REQUEST:
@@ -180,7 +178,7 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
                     break;
                 case Message.CAPABILITIES_EXCHANGE_ANSWER:
                  //   log("CER ANSWER");
-                    DWAThread = new Thread(new DewiceWatchDogMessage(e.getChannel()));
+                    DWAThread = new Thread(new DewiceWatchDogMessage(ctx.channel()));
                     DWAThread.start();
 
             }
@@ -189,23 +187,24 @@ public class OutboundHandler extends SimpleChannelUpstreamHandler {
 
 
     @Override
-    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e)
+    public void channelInactive(ChannelHandlerContext ctx)
             throws Exception {
-        log("Server channel closed " + ctx.getChannel().getRemoteAddress() + " id = " + ctx.getChannel().getId());
+        log("Server channel closed " + ctx.channel().remoteAddress());
         log("Stopping DWA Requests");
         DWAThread.interrupt();
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable e)
             throws Exception {
 
-        log("Server channel exception " + e.getCause() + ", id = " + ctx.getChannel().getId() + " adde " + ctx.getChannel().getRemoteAddress());
-        try {
+        log("Server channel exception " + e  + " adde " + ctx.channel().remoteAddress());
+/*        try {
             throw e.getCause();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
+       */
     }
 
     private void log(String txt) {

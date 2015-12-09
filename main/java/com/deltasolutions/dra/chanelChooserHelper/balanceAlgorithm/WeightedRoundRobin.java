@@ -1,6 +1,8 @@
 package com.deltasolutions.dra.chanelChooserHelper.balanceAlgorithm;
 
-import org.jboss.netty.channel.Channel;
+
+
+import io.netty.channel.Channel;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;

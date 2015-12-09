@@ -9,9 +9,12 @@ import com.deltasolutions.dra.config.ProxyAgent;
 import com.deltasolutions.dra.parser.AvpSetImpl;
 import com.deltasolutions.dra.parser.MessageImpl;
 import com.deltasolutions.dra.tcp.Encoder.DiameterEncoder;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufProcessor;
+import io.netty.channel.Channel;
+
+import java.nio.ByteBuffer;
+
 
 /**
  * Created by phil on 11/10/2015.
@@ -42,14 +45,15 @@ public class DewiceWatchDogMessage implements Runnable {
         }
     }
 
-    private ChannelBuffer DWA_msg() throws ParseException {
+    private ByteBuffer DWA_msg() throws ParseException {
         AvpSetImpl set = new AvpSetImpl();
         set.addAvp(Avp.ORIGIN_HOST, ProxyAgent.originHost, false);
-        set.addAvp(Avp.ORIGIN_REALM,ProxyAgent.originRealm , false);
+        set.addAvp(Avp.ORIGIN_REALM, ProxyAgent.originRealm, false);
 
 
         IMessage msg = new MessageImpl(Message.DEVICE_WATCHDOG_REQUEST, 16777251, (short) 0,  HopByHop, EndToEnd, set);
         msg.setRequest(true);
-        return ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(msg));
+
+        return  DiameterEncoder.parser.encodeMessage(msg);
     }
 }

@@ -1,33 +1,34 @@
 package com.deltasolutions.dra.tcp.Encoder;
 
 import com.deltasolutions.dra.parser.MessageParser;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.frame.FrameDecoder;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
+
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.util.List;
 
 /**
  * Created by phil on 11-May-15.
  */
-public class DiameterEncoder extends FrameDecoder {
+public class DiameterEncoder extends ByteToMessageDecoder {
     public static final MessageParser parser = new MessageParser();
+
     @Override
-    protected Object decode(ChannelHandlerContext channelHandlerContext, Channel channel, ChannelBuffer channelBuffer) throws Exception {
-        byte[] message = channelBuffer.array();
-        DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
-        int tmp = channelBuffer.toByteBuffer().getInt();
+    protected void decode(ChannelHandlerContext chx,ByteBuf byteBuf, List<Object> out) throws Exception {
+
+        int tmp = byteBuf.getInt(0);
         //channelBuffer.
         //data.position(0);
         //System.out.println(channelBuffer.toString());
         byte vers = (byte) (tmp >> 24);
         // extract the message length, so we know how much to read
         int messageLength = (tmp & 0x00FFFFFF);
-        if (messageLength > channelBuffer.readableBytes()) {
-            return null;
+        if (messageLength > byteBuf.readableBytes()) {
+            return;
         }
-        return parser.createMessage(channelBuffer.readBytes(messageLength).toByteBuffer());
+        out.add(parser.createMessage(byteBuf.readBytes(messageLength).nioBuffer()));
     }
 }

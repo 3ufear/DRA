@@ -6,14 +6,13 @@ import com.deltasolutions.dra.config.ProxyAgent;
 import com.deltasolutions.dra.parser.AvpSetImpl;
 import com.deltasolutions.dra.parser.MessageImpl;
 import com.deltasolutions.dra.tcp.Encoder.DiameterEncoder;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.ByteBuffer;
 import java.util.Date;
 
 public class CommandProcessor  {
@@ -40,16 +39,16 @@ public class CommandProcessor  {
 		_debug = true;
 	}
 
-    private ChannelBuffer DWA_msg() throws ParseException {
+    private ByteBuffer DWA_msg() throws ParseException {
         AvpSetImpl set = new AvpSetImpl();
         set.addAvp(Avp.ORIGIN_HOST, originHost, false);
         set.addAvp(Avp.ORIGIN_REALM, originRealm, false);
         set.addAvp(Avp.RESULT_CODE, resultCode);
         IMessage msg = new MessageImpl(Message.DEVICE_WATCHDOG_ANSWER, appId, (short) 0,  21414, 33252, set);
-        return ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(msg));
+        return DiameterEncoder.parser.encodeMessage(msg);
     }
 
-    private ChannelBuffer CEA_msg() throws ParseException {
+    private IMessage CEA_msg() throws ParseException {
         AvpSetImpl set = new AvpSetImpl();
         set.addAvp(264, originHost, false);
         set.addAvp(296, originRealm, false);
@@ -81,36 +80,40 @@ public class CommandProcessor  {
         set.addAvp(Avp.AUTH_APPLICATION_ID, 55557);
         IMessage msg = new MessageImpl(Message.CAPABILITIES_EXCHANGE_ANSWER, appId, (short) 0,  _nCtx.message.getHopByHopIdentifier(), _nCtx.message.getEndToEndIdentifier(), set);
         //IMessage msg = (IMessage) _nCtx.message.createAnswer();
-        return ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(msg));
+        return  msg;
     }
 
-    private ChannelBuffer DPA_msg() throws ParseException {
+    private ByteBuffer DPA_msg() throws ParseException {
         AvpSetImpl set = new AvpSetImpl();
         set.addAvp(264, originHost, false);
         set.addAvp(296, originRealm, false);
         set.addAvp(268, resultCode);
         IMessage msg = new MessageImpl(Message.DISCONNECT_PEER_ANSWER, appId, (short) 0,  _nCtx.message.getHopByHopIdentifier(), _nCtx.message.getEndToEndIdentifier(), set);
-        return ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(msg));
+        return DiameterEncoder.parser.encodeMessage(msg);
     }
 
-    private ChannelBuffer CCA_msg(MessageImpl msg) throws ParseException {
+    private ByteBuffer CCA_msg(MessageImpl msg) throws ParseException {
         IMessage message = new MessageImpl(msg);
         AvpSetImpl set = new AvpSetImpl();
         set.addAvp(264, originHost, false);
         set.addAvp(296, originRealm, false);
         set.addAvp(268, resultCode);
         message.setRequest(false);
-        return ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(message));
+        return DiameterEncoder.parser.encodeMessage(message);
     }
 	public void run() throws Exception {
        try {
+
             switch (_nCtx.message.getCommandCode()) {
                 case Message.CAPABILITIES_EXCHANGE_REQUEST:
                     log("CER Request");
-                    _nCtx.channel.write(CEA_msg());
+                    DiameterEncoder.parser.encodeMessage(CEA_msg()).array();
+
+                    _nCtx.channel.writeAndFlush(CEA_msg());
+
                     break;
                 case Message.DEVICE_WATCHDOG_REQUEST:
-                    log("DWR Request " + _nCtx.channel.getRemoteAddress());
+                    log("DWR Request " + _nCtx.channel.channel().remoteAddress());
                     _nCtx.channel.write(DWA_msg());
                     break;
                 case Message.CREDIT_CONTROL_REQUEST:
@@ -124,10 +127,10 @@ public class CommandProcessor  {
                         ServerConnectionsPool serverConnectionsPool = channelChooser.chooseChannel(_nCtx.message.getAvps());
                      //   String failoverName = serverConnectionsPool.getFailoverUpstream().split(",")[0];
                         String failoverName = "ups2";
-                        ClientChannels.setConnection(_nCtx.message.getSessionId(), _nCtx.channel, channelChooser.getPoolByName(failoverName).getConnection(), _nCtx.message, serverConnectionsPool.getFailoverUpstream());
+                        ClientChannels.setConnection(_nCtx.message.getSessionId(), _nCtx.channel.channel(), channelChooser.getPoolByName(failoverName).getConnection(), _nCtx.message, serverConnectionsPool.getFailoverUpstream());
                         Channel ch = serverConnectionsPool.getConnection();
                         synchronized (ch) {
-                            ch.write(ChannelBuffers.wrappedBuffer(DiameterEncoder.parser.encodeMessage(_nCtx.message)));//ССR request;
+                            ch.write(DiameterEncoder.parser.encodeMessage(_nCtx.message));//ССR request;
                         }
                         log("Sent to DRA Message with session_id " + session_id);
                     } catch (Exception e) {

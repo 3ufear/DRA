@@ -1,7 +1,8 @@
 package com.deltasolutions.dra.tcp;
 
 import com.deltasolutions.dra.base.IMessage;
-import org.jboss.netty.channel.Channel;
+import io.netty.channel.Channel;
+
 
 import java.util.HashMap;
 import java.util.Map;
